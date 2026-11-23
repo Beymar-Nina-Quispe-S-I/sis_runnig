@@ -118,10 +118,22 @@ function App() {
     )
   }
 
-  async function beginActivity() {
+  function openActivityView() {
     setDialog('')
-    const started = await tracker.start()
-    if (started) setActivePage('activity')
+    setActivePage('activity')
+  }
+
+  function requestActivityExit() {
+    if (tracker.status === 'locating') {
+      tracker.cancel()
+      setActivePage('map')
+      return
+    }
+    if (tracker.status === 'running' || tracker.status === 'paused') {
+      setDialog('leave-activity')
+      return
+    }
+    setActivePage('map')
   }
 
   if (activePage === 'activity') {
@@ -130,13 +142,17 @@ function App() {
         <ActivityView
           tracker={tracker}
           settings={settings}
+          location={homeLocation}
+          onLocate={locateHome}
+          onStart={tracker.start}
           onPause={tracker.pause}
           onResume={tracker.resume}
           onFinish={finishActivity}
-          onBack={() => setActivePage('map')}
+          onBack={requestActivityExit}
           onSettings={() => setDialog('settings')}
         />
         {dialog === 'save' && pendingActivity && <SaveActivityDialog activity={pendingActivity} onSave={savePendingActivity} onDiscard={discardPendingActivity} />}
+        {dialog === 'leave-activity' && <LeaveActivityDialog onStay={() => setDialog('')} onFinish={finishActivity} />}
         {dialog === 'settings' && <SettingsDialog settings={settings} onSave={updateSettings} onClose={() => setDialog('')} />}
       </div>
     )
@@ -260,7 +276,7 @@ function App() {
         {navigation.map((item) => <button key={item.id} className={activePage === item.id ? 'active' : ''} onClick={() => setActivePage(item.id)}><Icon name={item.icon} size={19} /><span>{item.label}</span></button>)}
       </nav>
 
-      {dialog === 'activity' && <ActivityDialog onClose={() => setDialog('')} onStart={beginActivity} activities={activities} />}
+      {dialog === 'activity' && <ActivityDialog onClose={() => setDialog('')} onStart={openActivityView} activities={activities} />}
       {dialog === 'settings' && <SettingsDialog settings={settings} onSave={updateSettings} onClose={() => setDialog('')} />}
       {dialog === 'save' && pendingActivity && <SaveActivityDialog activity={pendingActivity} onSave={savePendingActivity} onDiscard={discardPendingActivity} />}
     </div>
@@ -339,6 +355,21 @@ function ChallengesPage({ weeklyDistance }) {
 
 function EmptyState({ icon, title, text }) {
   return <div className="empty-state"><span><Icon name={icon} size={24} /></span><strong>{title}</strong><p>{text}</p></div>
+}
+
+function LeaveActivityDialog({ onStay, onFinish }) {
+  return (
+    <div className="dialog-backdrop">
+      <section className="dialog-card leave-activity-dialog" role="dialog" aria-modal="true" aria-labelledby="leave-activity-title">
+        <span className="dialog-symbol"><Icon name="pulse" size={23} /></span>
+        <div className="eyebrow"><span className="eyebrow-line" /> ACTIVIDAD EN CURSO</div>
+        <h2 id="leave-activity-title">Tu carrera sigue activa.</h2>
+        <p className="dialog-description">Para proteger tu recorrido, no puedes salir sin decidir qué hacer.</p>
+        <button className="primary-button save-activity-button" onClick={onStay}>Volver a la actividad</button>
+        <button className="finish-and-save-button" onClick={onFinish}><Icon name="stop" size={15} /> Finalizar y guardar</button>
+      </section>
+    </div>
+  )
 }
 
 export default App

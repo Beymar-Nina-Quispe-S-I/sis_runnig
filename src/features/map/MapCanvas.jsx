@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import '@tomickigrzegorz/leaflet-rotate'
+import '@tomickigrzegorz/leaflet-rotate/css'
 import 'leaflet/dist/leaflet.css'
 import Icon from '../../components/Icon.jsx'
 import './MapCanvas.css'
@@ -38,6 +40,7 @@ export default function MapCanvas({
   mapStyle = 'openstreetmap',
   onLocate,
   tracking = false,
+  activityMode = false,
 }) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -48,6 +51,7 @@ export default function MapCanvas({
   const followRef = useRef(true)
   const lastFocusedLocation = useRef(null)
   const [tileError, setTileError] = useState(false)
+  const [bearing, setBearing] = useState(0)
 
   useEffect(() => {
     if (!containerRef.current) return undefined
@@ -59,10 +63,15 @@ export default function MapCanvas({
       maxZoom: 19,
       zoomControl: false,
       attributionControl: true,
+      rotate: true,
+      touchRotate: true,
+      dragRotate: true,
     })
     mapRef.current = map
+    map.attributionControl.setPosition(activityMode ? 'topleft' : 'bottomright')
     markersRef.current = L.layerGroup().addTo(map)
     map.on('dragstart', () => { followRef.current = false })
+    map.on('rotate', () => setBearing(map.getBearing()))
 
     const resizeObserver = new ResizeObserver(() => map.invalidateSize({ pan: false }))
     resizeObserver.observe(containerRef.current)
@@ -76,7 +85,7 @@ export default function MapCanvas({
       markersRef.current = null
       locationMarkerRef.current = null
     }
-  }, [])
+  }, [activityMode])
 
   useEffect(() => {
     const map = mapRef.current
@@ -171,14 +180,33 @@ export default function MapCanvas({
     onLocate?.()
   }
 
+  function rotateMap() {
+    const map = mapRef.current
+    if (map) map.setBearing((map.getBearing() + 45) % 360)
+  }
+
+  function resetNorth(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    mapRef.current?.setBearing(0)
+  }
+
   return (
     <div className="map-viewport">
       <div className="leaflet-map" ref={containerRef} aria-label="Mapa real de OpenStreetMap con tu ubicación y recorrido" />
-      <div className="map-compass" aria-label="Norte, noreste, este, sureste, sur, suroeste, oeste y noroeste">
+      <button
+        className="map-compass"
+        style={{ '--map-bearing': `${-bearing}deg` }}
+        aria-label={`Girar mapa 45 grados; orientación actual ${Math.round(bearing)} grados. Doble clic para norte`}
+        title="Pulsa para girar 45°. Doble clic para volver al norte."
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => { event.stopPropagation(); rotateMap() }}
+        onDoubleClick={resetNorth}
+      >
         <span className="compass-n">N</span><span className="compass-ne">NE</span><span className="compass-e">E</span><span className="compass-se">SE</span>
         <span className="compass-s">S</span><span className="compass-sw">SO</span><span className="compass-w">O</span><span className="compass-nw">NO</span>
         <i className="compass-pointer" />
-      </div>
+      </button>
       {tileError && <div className="map-tile-error" role="status">No se pudieron cargar algunos mosaicos. Comprueba tu conexión.</div>}
       <div className="map-zoom">
         <button aria-label="Acercar mapa" onClick={() => mapRef.current?.zoomIn()}><Icon name="plus" size={16} /></button>

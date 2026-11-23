@@ -29,7 +29,9 @@ npm run preview
 - El registro utiliza la geolocalización de alta precisión del navegador y necesita permiso de ubicación.
 - El GPS requiere HTTPS o `localhost`; la aplicación no envía la ubicación a un servidor.
 - Las actividades y los ajustes se guardan en `localStorage` del dispositivo. Borrar los datos del navegador elimina ese historial.
-- Auto-pausa, pantalla encendida y creación de video dependen de las capacidades del navegador y del dispositivo.
+- La auto-pausa se activa tras 5 segundos sin movimiento GPS. Pantalla encendida y creación de video dependen de las capacidades del navegador y del dispositivo.
+- Durante una carrera, la brújula gira el mapa en pasos de 45°; un doble clic vuelve al norte y en pantalla táctil también se puede girar con dos dedos.
+- La vista de carrera solo se abre en espera; el cronómetro y el GPS no empiezan hasta pulsar “Iniciar actividad”. Intentar salir de una carrera activa requiere confirmación.
 - La vista de actividad muestra solo el mapa, el GPS y las métricas. Al finalizar, puedes guardar o descartar; las carreras guardadas aparecen en Recorridos con su trazado y los marcadores de inicio y final.
 - El mapa centrado en la posición requiere permiso GPS y mosaicos con conexión a internet. El seguimiento y el guardado local continúan funcionando sin conexión, pero no se garantiza la cartografía mientras estés offline.
 - Stadia Maps y OpenMapTiles son proveedores opcionales de mosaicos raster y requieren una clave propia de Stadia Maps. Leaflet muestra los mapas y las rutas en el navegador; MapLibre Android es una tecnología nativa de Android y no es necesaria para esta PWA.

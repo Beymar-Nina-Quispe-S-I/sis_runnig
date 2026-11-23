@@ -19,7 +19,9 @@
 .run-marker-start { background: #f2bc78; }
 .run-marker-finish { background: #73e6ff; }
 .current-location-dot { position: absolute; top: 5px; left: 5px; width: 15px; height: 15px; border: 3px solid white; border-radius: 50%; background: #1b8cf4; box-shadow: 0 0 0 7px rgba(30, 136, 245, .22), 0 1px 7px rgba(0, 0, 0, .48); }
-.map-compass { position: absolute; z-index: 400; top: 13px; right: 13px; width: 53px; height: 53px; color: #506574; border: 1px solid rgba(47, 73, 87, .18); border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 2px 9px rgba(26, 43, 53, .16); font-size: 6px; font-weight: 700; pointer-events: none; }
+.map-compass { position: absolute; z-index: 400; top: 13px; right: 13px; width: 53px; height: 53px; padding: 0; color: #506574; border: 1px solid rgba(47, 73, 87, .18); border-radius: 50%; background: rgba(255, 255, 255, .94); box-shadow: 0 2px 9px rgba(26, 43, 53, .16); font-size: 6px; font-weight: 700; cursor: pointer; transform: rotate(var(--map-bearing, 0deg)); transition: transform .2s ease, box-shadow .15s ease; }
+.map-compass:hover { box-shadow: 0 3px 12px rgba(26, 43, 53, .27); }
+.map-compass:focus-visible { outline: 2px solid #087c9d; outline-offset: 3px; }
 .map-compass span { position: absolute; z-index: 1; }
 .map-compass .compass-n { top: 3px; left: 23px; color: #d74b4b; }
 .map-compass .compass-ne { top: 8px; right: 6px; }
@@ -30,10 +32,28 @@
 .map-compass .compass-w { top: 22px; left: 3px; }
 .map-compass .compass-nw { top: 8px; left: 5px; }
 .map-compass .compass-pointer { position: absolute; top: 15px; left: 25px; width: 2px; height: 13px; border-radius: 2px; background: linear-gradient(#d74b4b 0 50%, #78909c 50%); transform: rotate(30deg); transform-origin: bottom; opacity: .8; }
-.map-zoom { position: absolute; z-index: 400; right: 13px; bottom: 13px; display: grid; gap: 5px; }
+.map-zoom { position: absolute; z-index: 400; top: 13px; left: 13px; display: grid; gap: 5px; }
 .map-zoom button { width: 31px; height: 31px; display: grid; place-items: center; color: #364c59; border: 1px solid rgba(47, 73, 87, .17); border-radius: 8px; background: rgba(255, 255, 255, .94); box-shadow: 0 1px 5px rgba(26, 43, 53, .14); cursor: pointer; }
 .map-zoom button:hover { color: #057c9d; background: #fff; }
 .map-tile-error, .map-provider-notice { position: absolute; z-index: 450; right: 52px; bottom: 14px; max-width: min(390px, calc(100% - 115px)); padding: 8px 10px; color: #713e18; border: 1px solid rgba(172, 115, 52, .23); border-radius: 7px; background: rgba(255, 247, 226, .96); font-size: 9px; line-height: 1.4; }
 .map-provider-notice { top: 14px; right: 75px; bottom: auto; max-width: 290px; color: #36505d; border-color: rgba(47, 73, 87, .14); background: rgba(255, 255, 255, .93); }
+.map-card .map-viewport { height: clamp(360px, 44vh, 520px); }
+.activity-screen .map-compass { top: 73px; right: 13px; }
+.activity-screen .map-zoom { top: 111px; left: 13px; }
+.activity-screen .leaflet-top.leaflet-left { top: 69px; }
+.activity-screen .map-tile-error { top: 111px; right: 55px; bottom: auto; left: 55px; max-width: none; text-align: center; }
 .theme-light .map-viewport { background: #dce5e8; }
 .theme-light .leaflet-container { background: #dce5e8; }
+@media (max-width: 600px) {
+  .map-card .map-viewport { height: clamp(320px, 47svh, 470px); }
+  .map-compass { top: 10px; right: 10px; width: 47px; height: 47px; }
+  .map-compass .compass-n { left: 20px; }
+  .map-compass .compass-s { left: 21px; }
+  .map-compass .compass-e { top: 19px; }
+  .map-compass .compass-w { top: 19px; }
+  .map-zoom { top: 10px; left: 10px; gap: 4px; }
+  .map-zoom button { width: 29px; height: 29px; }
+  .activity-screen .map-compass { top: 72px; right: 10px; }
+  .activity-screen .map-zoom { top: 108px; left: 10px; }
+  .activity-screen .leaflet-top.leaflet-left { top: 68px; }
+}

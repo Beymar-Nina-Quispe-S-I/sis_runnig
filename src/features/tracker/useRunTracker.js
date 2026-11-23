@@ -28,6 +28,7 @@ export default function useRunTracker(settings) {
   const settingsRef = useRef(settings)
   const wakeLock = useRef(null)
   const autoPaused = useRef(false)
+  const requestId = useRef(0)
 
   useEffect(() => {
     settingsRef.current = settings
@@ -36,7 +37,7 @@ export default function useRunTracker(settings) {
   useEffect(() => {
     if (run.status !== 'running') return undefined
     const timer = window.setInterval(() => {
-      if (settingsRef.current.autoPause && Date.now() - lastMoveAt.current > 12000 && run.points.length > 0) {
+      if (settingsRef.current.autoPause && Date.now() - lastMoveAt.current >= 5000 && run.points.length > 0) {
         autoPaused.current = true
         setRun((current) => ({ ...current, status: 'paused' }))
         return
@@ -65,6 +66,7 @@ export default function useRunTracker(settings) {
   }, [settings.keepAwake, run.status])
 
   useEffect(() => () => {
+    requestId.current += 1
     if (watchId.current !== null) navigator.geolocation?.clearWatch(watchId.current)
     if (wakeLock.current) wakeLock.current.release()
   }, [])
@@ -125,14 +127,27 @@ export default function useRunTracker(settings) {
     lastPoint.current = null
     lastMoveAt.current = Date.now()
     autoPaused.current = false
+    const activeRequest = ++requestId.current
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition((position) => {
+        if (activeRequest !== requestId.current) {
+          resolve(false)
+          return
+        }
         onPosition(position)
-        watchId.current = navigator.geolocation.watchPosition(onPosition, (error) => {
-          setRun((current) => ({ ...current, error: error.message || 'No se pudo actualizar la ubicación GPS.' }))
+        watchId.current = navigator.geolocation.watchPosition((nextPosition) => {
+          if (activeRequest === requestId.current) onPosition(nextPosition)
+        }, (error) => {
+          if (activeRequest === requestId.current) {
+            setRun((current) => ({ ...current, error: error.message || 'No se pudo actualizar la ubicación GPS.' }))
+          }
         }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 })
         resolve(true)
       }, (error) => {
+        if (activeRequest !== requestId.current) {
+          resolve(false)
+          return
+        }
         const message = error.code === 1
           ? 'Activa el permiso de ubicación en tu navegador para registrar la carrera.'
           : error.code === 3
@@ -158,6 +173,7 @@ export default function useRunTracker(settings) {
 
   function finish() {
     const completed = run
+    requestId.current += 1
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current)
       watchId.current = null
@@ -169,5 +185,16 @@ export default function useRunTracker(settings) {
     return { ...completed, finishedAt: new Date().toISOString(), sport: settingsRef.current.sport }
   }
 
-  return { ...run, start, pause, resume, finish }
+  function cancel() {
+    requestId.current += 1
+    if (watchId.current !== null) {
+      navigator.geolocation.clearWatch(watchId.current)
+      watchId.current = null
+    }
+    setRun(initialRun)
+    lastPoint.current = null
+    autoPaused.current = false
+  }
+
+  return { ...run, start, pause, resume, finish, cancel }
 }

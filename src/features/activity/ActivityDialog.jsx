@@ -47,10 +47,10 @@ export default function ActivityDialog({ onClose, onStart, activities }) {
           <button className="dialog-close" aria-label="Cerrar" onClick={onClose}><Icon name="close" size={18} /></button>
           <span className="dialog-symbol location-symbol"><Icon name="locate" size={22} /></span>
           <div className="eyebrow"><span className="eyebrow-line" /> PREPARA TU CARRERA</div>
-          <h2 id="location-title">Activa tu<br />ubicación GPS.</h2>
-          <p className="dialog-description">Necesitamos tu ubicación precisa para medir la distancia y dibujar tu recorrido.</p>
-          <div className="location-tip"><Icon name="target" size={17} /><span>Al continuar, tu navegador te pedirá permiso para acceder a la ubicación. Tus datos se guardan solo en este dispositivo.</span></div>
-          <button className="primary-button location-start" onClick={onStart}><Icon name="locate" size={17} /> Activar ubicación y empezar</button>
+          <h2 id="location-title">Prepara tu<br />actividad.</h2>
+          <p className="dialog-description">La actividad no comenzará todavía. En el mapa tendrás un botón para iniciarla cuando estés listo.</p>
+          <div className="location-tip"><Icon name="target" size={17} /><span>El permiso GPS se solicitará cuando pulses Iniciar. Tus datos se guardan solo en este dispositivo.</span></div>
+          <button className="primary-button location-start" onClick={onStart}><Icon name="map" size={17} /> Abrir vista de actividad</button>
           <button className="video-back" onClick={() => setLocationMode(false)}><Icon name="chevron" size={14} /> Volver</button>
         </section>
       </div>
