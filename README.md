@@ -1,16 +1,33 @@
-# React + Vite
+# Ritmo · Run club
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web progresiva para registrar carreras, consultar estadísticas y completar retos. La interfaz y los datos funcionan sin conexión después de cargar la aplicación; las actividades y preferencias se guardan localmente en el navegador.
 
-Currently, two official plugins are available:
+## Desarrollo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev
+```
 
-## React Compiler
+Para comprobar la versión de producción:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm run build
+npm run preview
+```
 
-## Expanding the ESLint configuration
+## Ubicación y privacidad
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- El registro utiliza la geolocalización de alta precisión del navegador y necesita permiso de ubicación.
+- El GPS requiere HTTPS o `localhost`; la aplicación no envía la ubicación a un servidor.
+- Las actividades y los ajustes se guardan en `localStorage` del dispositivo. Borrar los datos del navegador elimina ese historial.
+- Auto-pausa, pantalla encendida y creación de video dependen de las capacidades del navegador y del dispositivo.
+- El mapa incluido es un esquema local sin calles cartográficas; la posición y la ruta registradas sí se dibujan a partir de las coordenadas GPS.
+
+## Organización
+
+- `src/features/tracker`: seguimiento GPS y almacenamiento local de actividades.
+- `src/features/map`: mapa esquemático y visualización de la ruta.
+- `src/features/activity`: registro de actividad y exportación de video.
+- `src/features/settings`: preferencias de entrenamiento y apariencia.
+- `src/App.jsx` y `src/App.css`: navegación, páginas y estilos generales.

@@ -1,0 +1,35 @@
+.dialog-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; overflow: auto; padding: 18px; background: rgba(4, 10, 16, .74); backdrop-filter: blur(7px); animation: backdrop-in .16s ease; }
+@keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+.dialog-card { position: relative; width: min(100%, 420px); padding: 30px; border: 1px solid rgba(159, 197, 216, .16); border-radius: 17px; background: #111d29; box-shadow: 0 22px 90px rgba(0, 0, 0, .45); animation: dialog-in .2s ease; }
+.theme-light .dialog-card { background: #fff; }
+@keyframes dialog-in { from { opacity: .7; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: none; } }
+.dialog-close { position: absolute; top: 18px; right: 18px; width: 31px; height: 31px; display: grid; place-items: center; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; background: transparent; cursor: pointer; }
+.dialog-close:hover { color: var(--text); }
+.dialog-symbol { width: 43px; height: 43px; display: grid; place-items: center; margin-bottom: 22px; color: #0c202a; border-radius: 12px; background: #73e6ff; }
+.activity-dialog h2, .settings-dialog h2 { margin-top: 12px; color: var(--text); font: 700 25px/1.2 'Manrope', sans-serif; letter-spacing: -.8px; }
+.dialog-description { margin-top: 8px; color: var(--muted); font-size: 11px; }
+.activity-choice { width: 100%; min-height: 65px; display: flex; align-items: center; gap: 12px; margin-top: 11px; padding: 10px 12px; color: var(--text); border: 1px solid var(--border); border-radius: 10px; background: rgba(130, 165, 186, .035); text-align: left; cursor: pointer; transition: .15s ease; }
+.activity-choice:first-of-type { margin-top: 24px; }
+.activity-choice:hover:not(:disabled) { border-color: rgba(115, 230, 255, .36); background: rgba(115, 230, 255, .06); }
+.activity-choice:disabled { opacity: .6; cursor: not-allowed; }
+.activity-choice > span:nth-child(2) { flex: 1; display: grid; gap: 5px; }
+.activity-choice strong { font-size: 11px; font-weight: 600; }
+.activity-choice small { color: var(--muted); font-size: 9px; }
+.activity-choice > svg { color: var(--muted); }
+.choice-icon { width: 36px; height: 36px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 9px; }
+.run-choice { color: #82e5fb; background: rgba(115, 230, 255, .11); }
+.video-choice { color: #c4a0ff; background: rgba(196, 160, 255, .11); }
+.video-symbol { color: #201630; background: #c4a0ff; }
+.location-symbol { color: #0c202a; background: #73e6ff; }
+.location-tip { display: flex; align-items: flex-start; gap: 10px; margin-top: 22px; padding: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 9px; background: rgba(130, 165, 186, .035); font-size: 9px; line-height: 1.55; }
+.location-tip svg { flex: 0 0 auto; color: var(--cyan); }
+.location-start { width: 100%; margin-top: 18px; }
+.video-select-label { display: block; margin: 22px 0 8px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .8px; }
+.video-create { width: 100%; margin-top: 15px; }
+.video-create:disabled { opacity: .7; cursor: progress; }
+.video-status { margin-top: 10px; color: #ffb1a7; font-size: 10px; line-height: 1.5; }
+.video-status.success { color: #83e3b2; }
+.video-back { display: flex; align-items: center; gap: 5px; margin: 15px auto 0; padding: 3px; color: var(--muted); border: 0; background: transparent; font-size: 9px; cursor: pointer; }
+.video-back svg { transform: rotate(180deg); }
+.privacy-note { display: flex; justify-content: center; align-items: center; gap: 7px; margin-top: 20px; color: var(--muted); font-size: 9px; line-height: 1.55; text-align: center; }
+.privacy-note svg { flex: 0 0 auto; color: var(--cyan); }

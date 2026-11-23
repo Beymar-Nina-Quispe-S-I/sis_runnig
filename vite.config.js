@@ -11,26 +11,23 @@ export default defineConfig({
       registerType: 'autoUpdate',
       
       // Incluir recursos adicionales en la caché (si tienes iconos, etc.)
-      includeAssets: ['favicon.ico', 'icons/*.png'],
+      includeAssets: ['ritmo-icon.svg'],
       
       // Configuración del Manifest: determina cómo se ve al "agregar a pantalla de inicio"
       manifest: {
-        name: 'Mi Registro de Atletismo',
-        short_name: 'Atletismo',
-        description: 'Aplicación personal de registro de trayectorias offline',
-        theme_color: '#1a1a1a',
-        background_color: '#1a1a1a',
+        name: 'Ritmo · Run club',
+        short_name: 'Ritmo',
+        description: 'Entrena, registra tus recorridos y progresa sin conexión.',
+        lang: 'es',
+        theme_color: '#0c131d',
+        background_color: '#0c131d',
         display: 'standalone', // Apariencia similar a una app nativa
         icons: [
           {
-            src: '/icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: '/ritmo-icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any'
           }
         ]
       },
