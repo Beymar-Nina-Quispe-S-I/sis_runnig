@@ -1,0 +1,59 @@
+.activity-screen { position: fixed; inset: 0; z-index: 8; overflow: hidden; color: #eaf3fa; background: #101923; }
+.activity-screen > .map-viewport { position: absolute; inset: 0; height: auto; border-radius: 0; }
+.activity-screen-top { position: absolute; z-index: 500; top: max(16px, env(safe-area-inset-top)); left: 18px; right: 18px; max-width: 760px; min-height: 53px; display: flex; align-items: center; gap: 12px; margin-inline: auto; padding: 8px; border: 1px solid rgba(164, 196, 209, .2); border-radius: 13px; background: rgba(13, 24, 34, .89); box-shadow: 0 7px 24px rgba(0, 0, 0, .22); backdrop-filter: blur(14px); }
+.activity-screen-top > div { flex: 1; display: grid; gap: 3px; }
+.activity-screen-top strong { font: 600 12px 'Manrope', sans-serif; }
+.activity-screen-top span { color: #94a8b7; font-size: 9px; }
+.activity-screen-top button { width: 35px; height: 35px; display: grid; place-items: center; color: #d7e8ef; border: 1px solid rgba(164, 196, 209, .14); border-radius: 9px; background: rgba(255, 255, 255, .035); cursor: pointer; }
+.activity-screen-top button:hover { color: #73e6ff; border-color: rgba(115, 230, 255, .4); }
+.activity-back svg { transform: rotate(180deg); }
+.activity-live-panel { position: absolute; z-index: 500; right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); left: 18px; width: min(100% - 36px, 760px); margin-inline: auto; padding: 20px 22px 14px; border: 1px solid rgba(164, 196, 209, .18); border-radius: 16px; background: rgba(13, 24, 34, .94); box-shadow: 0 12px 42px rgba(0, 0, 0, .3); backdrop-filter: blur(16px); }
+.live-distance > span, .live-metrics > div > span, .save-activity-summary span { display: block; color: #8299a8; font-size: 8px; font-weight: 700; letter-spacing: 1px; }
+.live-distance > strong { display: block; margin-top: 2px; font: 700 clamp(38px, 7vw, 56px)/1.1 'Manrope', sans-serif; letter-spacing: -2px; }
+.live-distance > strong small { color: #94a8b7; font-size: 18px; letter-spacing: 0; }
+.live-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px 0; margin-top: 12px; border-top: 1px solid rgba(164, 196, 209, .12); border-bottom: 1px solid rgba(164, 196, 209, .12); }
+.live-metrics > div { display: grid; gap: 5px; }
+.live-metrics > div > span { font-size: 7px; }
+.live-metrics strong { font: 600 15px 'Manrope', sans-serif; }
+.live-metrics strong small { color: #94a8b7; font: 400 10px 'DM Sans', sans-serif; }
+.live-endpoints { display: flex; gap: 16px; padding: 12px 0 14px; color: #a4b7c3; font-size: 9px; }
+.live-endpoints > span { display: flex; align-items: center; gap: 6px; }
+.endpoint-start, .endpoint-finish { width: 17px; height: 17px; display: inline-grid; place-items: center; color: #16222b; border-radius: 50%; font-size: 8px; font-style: normal; font-weight: 700; }
+.endpoint-start { background: #f2bc78; }
+.endpoint-finish { background: #73e6ff; }
+.endpoint-current { width: 17px; height: 17px; display: inline-grid; place-items: center; color: #73e6ff; font-style: normal; }
+.activity-live-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.activity-live-controls button { min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.activity-live-controls button:disabled { opacity: .6; cursor: default; }
+.live-pause-button { color: #eaf3fa; border: 1px solid rgba(164, 196, 209, .2); background: rgba(255, 255, 255, .05); }
+.live-finish-button { color: #10232b; border: 0; background: #73e6ff; }
+.activity-live-controls button:hover:not(:disabled) { filter: brightness(1.08); }
+.live-accuracy { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 11px; color: #8299a8; font-size: 8px; text-align: center; }
+.live-accuracy svg { color: #73e6ff; }
+.activity-gps-error { margin: 0 0 10px; color: #ffb1a7; font-size: 10px; text-align: center; }
+.activity-screen .leaflet-control-attribution { max-width: calc(100vw - 120px); margin: 0 0 0 auto; padding: 2px 6px; font-size: 8px; }
+.activity-screen .map-compass { top: 82px; right: 20px; }
+.activity-screen .map-zoom { top: 148px; right: 30px; bottom: auto; }
+.activity-screen .map-provider-notice { bottom: 76px; }
+.save-activity-dialog { width: min(100%, 430px); }
+.save-activity-dialog h2 { margin-top: 10px; color: var(--text); font: 700 25px/1.2 'Manrope', sans-serif; letter-spacing: -.8px; }
+.activity-name-input { width: 100%; height: 40px; padding: 0 11px; color: var(--text); border: 1px solid var(--border); border-radius: 8px; background: var(--panel-raised); font-size: 11px; }
+.save-activity-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 17px; padding: 14px 12px; border: 1px solid var(--border); border-radius: 9px; background: rgba(130, 165, 186, .035); }
+.save-activity-summary > div { display: grid; gap: 5px; }
+.save-activity-summary span { font-size: 7px; }
+.save-activity-summary strong { font: 600 12px 'Manrope', sans-serif; }
+.save-activity-times { margin-top: 11px; color: var(--muted); font-size: 9px; }
+.save-activity-button { width: 100%; margin-top: 18px; }
+.discard-activity-button { width: 100%; margin-top: 10px; padding: 9px; color: #ffb1a7; border: 0; background: transparent; font-size: 10px; cursor: pointer; }
+.discard-activity-button:hover { color: #ffd1ca; }
+@media (max-width: 600px) {
+  .activity-screen-top { top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; }
+  .activity-live-panel { right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); left: 10px; width: auto; padding: 16px 15px 12px; }
+  .live-distance > strong { font-size: 45px; }
+  .live-metrics { padding: 12px 0; margin-top: 10px; }
+  .live-metrics strong { font-size: 13px; }
+  .live-endpoints { gap: 10px; font-size: 8px; }
+  .activity-live-controls button { min-height: 44px; }
+  .activity-screen .map-compass { top: 72px; right: 12px; }
+  .activity-screen .map-zoom { top: 135px; right: 21px; }
+}

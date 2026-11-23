@@ -2,6 +2,7 @@ import Icon from '../../components/Icon.jsx'
 import './SettingsDialog.css'
 
 const routeColors = ['#73e6ff', '#a8f07a', '#ffad72', '#c4a0ff', '#ff83aa']
+const stadiaKeyAvailable = Boolean(import.meta.env.VITE_STADIA_MAPS_API_KEY)
 
 export default function SettingsDialog({ settings, onSave, onClose }) {
   function update(key, value) {
@@ -20,6 +21,14 @@ export default function SettingsDialog({ settings, onSave, onClose }) {
         <select id="sport-select" className="setting-select" value={settings.sport} onChange={(event) => update('sport', event.target.value)}>
           <option>Atletismo</option><option>Trail running</option><option>Caminata</option>
         </select>
+
+        <label className="setting-label" htmlFor="map-provider">Cartografía</label>
+        <select id="map-provider" className="setting-select" value={settings.mapStyle} onChange={(event) => update('mapStyle', event.target.value)}>
+          <option value="openstreetmap">OpenStreetMap</option>
+          <option value="stadia" disabled={!stadiaKeyAvailable}>Stadia Maps · Alidade Smooth {!stadiaKeyAvailable ? '(requiere API key)' : ''}</option>
+          <option value="openmaptiles" disabled={!stadiaKeyAvailable}>OpenMapTiles · Outdoors {!stadiaKeyAvailable ? '(requiere API key)' : ''}</option>
+        </select>
+        {!stadiaKeyAvailable && <p className="map-key-note">OpenStreetMap está activo. Para Stadia Maps u OpenMapTiles, configura VITE_STADIA_MAPS_API_KEY.</p>}
 
         <div className="setting-row"><div><strong>Auto-pausa</strong><small>Pausa el tiempo cuando te detienes</small></div><button className={`toggle ${settings.autoPause ? 'on' : ''}`} role="switch" aria-checked={settings.autoPause} aria-label="Auto-pausa" onClick={() => update('autoPause', !settings.autoPause)}><span /></button></div>
         <div className="setting-row"><div><strong>Mantener pantalla encendida</strong><small>Evita que la pantalla se apague al correr</small></div><button className={`toggle ${settings.keepAwake ? 'on' : ''}`} role="switch" aria-checked={settings.keepAwake} aria-label="Mantener pantalla encendida" onClick={() => update('keepAwake', !settings.keepAwake)}><span /></button></div>

@@ -1,0 +1,57 @@
+import MapCanvas from '../map/MapCanvas.jsx'
+import Icon from '../../components/Icon.jsx'
+import './ActivityView.css'
+
+function formatDuration(seconds = 0) {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remaining = seconds % 60
+  return [hours, minutes, remaining].map((part) => String(part).padStart(2, '0')).join(':')
+}
+
+function formatClock(value) {
+  return value ? new Intl.DateTimeFormat('es', { hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : '—'
+}
+
+export default function ActivityView({ tracker, settings, onPause, onResume, onFinish, onBack, onSettings }) {
+  const currentPoint = tracker.points[tracker.points.length - 1] || null
+
+  return (
+    <main className="activity-screen">
+      <MapCanvas
+        points={tracker.points}
+        location={tracker.location}
+        startPoint={tracker.points[0]}
+        color={settings.routeColor}
+        mapStyle={settings.mapStyle}
+        tracking
+      />
+      <header className="activity-screen-top">
+        <button className="activity-back" aria-label="Volver al panel" onClick={onBack}><Icon name="chevron" size={18} /></button>
+        <div><strong>{settings.sport}</strong><span>{tracker.status === 'paused' ? 'Pausada' : tracker.status === 'locating' ? 'Buscando GPS…' : 'Grabando recorrido'}</span></div>
+        <button className="activity-settings" aria-label="Ajustes de actividad" onClick={onSettings}><Icon name="settings" size={18} /></button>
+      </header>
+
+      <section className="activity-live-panel" aria-label="Datos de actividad">
+        <div className="live-distance"><span>DISTANCIA</span><strong>{(tracker.distance / 1000).toFixed(2)}<small> km</small></strong></div>
+        <div className="live-metrics">
+          <div><span>TIEMPO</span><strong>{formatDuration(tracker.elapsed)}</strong></div>
+          <div><span>DESNIVEL +</span><strong>{Math.round(tracker.elevation)} <small>m</small></strong></div>
+          <div><span>RITMO</span><strong>{tracker.distance ? `${Math.floor(tracker.elapsed / (tracker.distance / 1000) / 60)}′${String(Math.floor(tracker.elapsed / (tracker.distance / 1000)) % 60).padStart(2, '0')}″` : '—'} <small>/km</small></strong></div>
+        </div>
+        <div className="live-endpoints">
+          <span><i className="endpoint-start">I</i> Inicio {formatClock(tracker.startedAt)}</span>
+          <span><i className="endpoint-current"><Icon name="locate" size={11} /></i> {currentPoint ? 'GPS actual' : 'Buscando GPS'} {currentPoint ? formatClock(currentPoint.timestamp) : ''}</span>
+        </div>
+        {tracker.error && <p className="activity-gps-error" role="alert">{tracker.error}</p>}
+        <div className="activity-live-controls">
+          <button className="live-pause-button" onClick={tracker.status === 'paused' ? onResume : onPause} disabled={tracker.status === 'locating'}>
+            <Icon name={tracker.status === 'paused' ? 'play' : 'pause'} size={17} />{tracker.status === 'paused' ? 'Continuar' : 'Pausar'}
+          </button>
+          <button className="live-finish-button" onClick={onFinish} disabled={tracker.status === 'locating'}><Icon name="stop" size={17} /> Finalizar</button>
+        </div>
+        <p className="live-accuracy"><Icon name="target" size={13} /> GPS de alta precisión · El recorrido se guarda en este dispositivo</p>
+      </section>
+    </main>
+  )
+}

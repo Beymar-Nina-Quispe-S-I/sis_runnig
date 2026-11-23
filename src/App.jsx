@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import Icon from './components/Icon.jsx'
 import MapCanvas from './features/map/MapCanvas.jsx'
 import ActivityDialog from './features/activity/ActivityDialog.jsx'
+import ActivityView from './features/activity/ActivityView.jsx'
+import SaveActivityDialog from './features/activity/SaveActivityDialog.jsx'
 import SettingsDialog from './features/settings/SettingsDialog.jsx'
 import useRunTracker from './features/tracker/useRunTracker.js'
 import { readActivities, saveActivity } from './features/tracker/activityStore.js'
@@ -19,6 +21,7 @@ const initialSettings = {
   keepAwake: false,
   sport: 'Atletismo',
   routeColor: '#73e6ff',
+  mapStyle: 'openstreetmap',
   theme: 'dark',
 }
 
@@ -52,8 +55,11 @@ function currentWeekStart() {
 function App() {
   const [activePage, setActivePage] = useState('map')
   const [dialog, setDialog] = useState('')
+  const [pendingActivity, setPendingActivity] = useState(null)
   const [settings, setSettings] = useState(readSettings)
   const [activities, setActivities] = useState(readActivities)
+  const [homeLocation, setHomeLocation] = useState(null)
+  const [locationError, setLocationError] = useState('')
   const tracker = useRunTracker(settings)
 
   const weeklyDistance = useMemo(() => {
@@ -71,10 +77,69 @@ function App() {
   function finishActivity() {
     const activity = tracker.finish()
     if (activity) {
-      const saved = { ...activity, id: crypto.randomUUID(), name: `Carrera · ${formatDate(activity.startedAt)}` }
-      saveActivity(saved)
-      setActivities(readActivities())
+      setPendingActivity({ ...activity, id: crypto.randomUUID(), name: `Carrera · ${formatDate(activity.startedAt)}` })
+      setDialog('save')
     }
+  }
+
+  function savePendingActivity(name) {
+    if (!pendingActivity) return
+    const saved = { ...pendingActivity, name }
+    saveActivity(saved)
+    setActivities(readActivities())
+    setPendingActivity(null)
+    setDialog('')
+    setActivePage('routes')
+  }
+
+  function discardPendingActivity() {
+    if (!window.confirm('¿Descartar esta actividad? El recorrido no se guardará.')) return
+    setPendingActivity(null)
+    setDialog('')
+    setActivePage('routes')
+  }
+
+  function locateHome() {
+    if (!navigator.geolocation) {
+      setLocationError('Este navegador no permite obtener la ubicación GPS.')
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setHomeLocation({ latitude: coords.latitude, longitude: coords.longitude })
+        setLocationError('')
+      },
+      (error) => {
+        setLocationError(error.code === 1
+          ? 'Activa el permiso de ubicación para centrar el mapa.'
+          : 'No se pudo obtener tu ubicación. Comprueba el GPS e inténtalo otra vez.')
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
+    )
+  }
+
+  async function beginActivity() {
+    setDialog('')
+    const started = await tracker.start()
+    if (started) setActivePage('activity')
+  }
+
+  if (activePage === 'activity') {
+    return (
+      <div className={`app-shell theme-${settings.theme}`}>
+        <ActivityView
+          tracker={tracker}
+          settings={settings}
+          onPause={tracker.pause}
+          onResume={tracker.resume}
+          onFinish={finishActivity}
+          onBack={() => setActivePage('map')}
+          onSettings={() => setDialog('settings')}
+        />
+        {dialog === 'save' && pendingActivity && <SaveActivityDialog activity={pendingActivity} onSave={savePendingActivity} onDiscard={discardPendingActivity} />}
+        {dialog === 'settings' && <SettingsDialog settings={settings} onSave={updateSettings} onClose={() => setDialog('')} />}
+      </div>
+    )
   }
 
   return (
@@ -132,8 +197,8 @@ function App() {
                   <h1>Corre a tu <span>ritmo.</span></h1>
                   <p className="page-subtitle">Cada paso cuenta. Sal ahí fuera y hazlo tuyo.</p>
                 </div>
-                <button className="primary-button start-button" disabled={tracker.status === 'locating' || tracker.status === 'running'} onClick={() => tracker.status === 'idle' ? setDialog('activity') : tracker.resume()}>
-                  <Icon name="play" size={17} /> {tracker.status === 'idle' ? 'Iniciar carrera' : tracker.status === 'paused' ? 'Reanudar carrera' : tracker.status === 'locating' ? 'Buscando GPS…' : 'Carrera en curso'}
+                <button className="primary-button start-button" disabled={tracker.status === 'locating'} onClick={() => tracker.status === 'idle' ? setDialog('activity') : setActivePage('activity')}>
+                  <Icon name={tracker.status === 'idle' ? 'play' : 'route'} size={17} /> {tracker.status === 'idle' ? 'Iniciar carrera' : tracker.status === 'paused' ? 'Volver a carrera' : tracker.status === 'locating' ? 'Buscando GPS…' : 'Volver a carrera'}
                 </button>
               </section>
 
@@ -143,8 +208,14 @@ function App() {
                     <div className="map-heading"><span className={`live-dot ${tracker.status !== 'running' ? 'muted' : ''}`} /><div><strong>{tracker.status === 'running' ? 'Actividad en curso' : 'Tu zona de entrenamiento'}</strong><small>{tracker.location ? 'Ubicación GPS conectada' : 'Mapa listo para tu próxima salida'}</small></div></div>
                     <button className="map-action" aria-label="Ajustes de actividad" onClick={() => setDialog('settings')}><Icon name="settings" size={17} /></button>
                   </div>
-                  <MapCanvas points={tracker.points} color={settings.routeColor} />
-                  <div className="map-legend"><span><i className="legend-dot" /> Tu ubicación</span><span><i className="legend-route" style={{ backgroundColor: settings.routeColor }} /> Tu recorrido</span><span className="map-coordinate">{tracker.location ? `${tracker.location.latitude.toFixed(4)}°, ${tracker.location.longitude.toFixed(4)}°` : 'GPS en espera'}</span></div>
+                  <MapCanvas
+                    location={tracker.location || homeLocation}
+                    color={settings.routeColor}
+                    mapStyle={settings.mapStyle}
+                    onLocate={locateHome}
+                  />
+                  <div className="map-legend"><span><i className="legend-dot" /> Tu ubicación</span><span><i className="legend-route" style={{ backgroundColor: settings.routeColor }} /> Tu recorrido</span><span className="map-coordinate">{(tracker.location || homeLocation) ? `${(tracker.location || homeLocation).latitude.toFixed(4)}°, ${(tracker.location || homeLocation).longitude.toFixed(4)}°` : 'Ubicación no centrada'}</span></div>
+                  {locationError && <p className="map-location-error" role="alert">{locationError}</p>}
                 </div>
 
                 <aside className="run-panel">
@@ -179,7 +250,7 @@ function App() {
             </>
           )}
 
-          {activePage === 'routes' && <RoutesPage activities={activities} onStart={() => setDialog('activity')} />}
+          {activePage === 'routes' && <RoutesPage activities={activities} settings={settings} onStart={() => setDialog('activity')} />}
           {activePage === 'stats' && <StatsPage activities={activities} weeklyDistance={weeklyDistance} />}
           {activePage === 'challenges' && <ChallengesPage weeklyDistance={weeklyDistance} />}
         </div>
@@ -189,17 +260,54 @@ function App() {
         {navigation.map((item) => <button key={item.id} className={activePage === item.id ? 'active' : ''} onClick={() => setActivePage(item.id)}><Icon name={item.icon} size={19} /><span>{item.label}</span></button>)}
       </nav>
 
-      {dialog === 'activity' && <ActivityDialog onClose={() => setDialog('')} onStart={async () => { setDialog(''); await tracker.start() }} activities={activities} />}
+      {dialog === 'activity' && <ActivityDialog onClose={() => setDialog('')} onStart={beginActivity} activities={activities} />}
       {dialog === 'settings' && <SettingsDialog settings={settings} onSave={updateSettings} onClose={() => setDialog('')} />}
+      {dialog === 'save' && pendingActivity && <SaveActivityDialog activity={pendingActivity} onSave={savePendingActivity} onDiscard={discardPendingActivity} />}
     </div>
   )
 }
 
-function RoutesPage({ activities, onStart }) {
+function RoutesPage({ activities, settings, onStart }) {
+  const [selectedActivity, setSelectedActivity] = useState(null)
+
+  if (selectedActivity) {
+    const firstPoint = selectedActivity.points?.[0]
+    const finalPoint = selectedActivity.points?.[selectedActivity.points.length - 1]
+    return (
+      <section className="subpage">
+        <div className="subpage-heading">
+          <div>
+            <div className="eyebrow"><span className="eyebrow-line" /> RECORRIDO GUARDADO</div>
+            <h1>{selectedActivity.name}</h1>
+            <p className="page-subtitle">{formatDate(selectedActivity.startedAt)} · {formatClock(selectedActivity.startedAt)}–{formatClock(selectedActivity.finishedAt)}</p>
+          </div>
+          <button className="primary-button route-back-button" onClick={() => setSelectedActivity(null)}><Icon name="chevron" size={16} /> Volver</button>
+        </div>
+        <div className="saved-route-card">
+          <MapCanvas
+            points={selectedActivity.points || []}
+            startPoint={firstPoint}
+            endPoint={finalPoint}
+            location={null}
+            color={settings.routeColor}
+            mapStyle={settings.mapStyle}
+          />
+          <div className="saved-route-summary">
+            <div><span>DISTANCIA</span><strong>{(selectedActivity.distance / 1000).toFixed(2)} km</strong></div>
+            <div><span>TIEMPO</span><strong>{formatDuration(selectedActivity.elapsed)}</strong></div>
+            <div><span>DESNIVEL +</span><strong>{Math.round(selectedActivity.elevation)} m</strong></div>
+            <div className="saved-route-pins"><span><i className="endpoint-start">I</i> Inicio</span><span><i className="endpoint-finish">F</i> Final</span></div>
+          </div>
+        </div>
+        {!selectedActivity.points?.length && <p className="map-location-error">Esta actividad se guardó sin puntos GPS, por lo que no se puede mostrar su trazado.</p>}
+      </section>
+    )
+  }
+
   return (
     <section className="subpage">
       <div className="subpage-heading"><div><div className="eyebrow"><span className="eyebrow-line" /> TU HISTORIAL</div><h1>Mis <span>recorridos.</span></h1><p className="page-subtitle">Todos tus pasos, guardados en este dispositivo.</p></div><button className="primary-button" onClick={onStart}><Icon name="play" size={16} /> Nueva carrera</button></div>
-      {activities.length ? <div className="activity-list">{activities.slice().reverse().map((activity) => <article className="activity-row" key={activity.id}><div className="activity-route-icon"><Icon name="route" size={19} /></div><div className="activity-name"><strong>{activity.name}</strong><small>{formatDate(activity.startedAt)} · {formatClock(activity.startedAt)}–{formatClock(activity.finishedAt)} · {activity.sport || 'Atletismo'}</small></div><div className="activity-value"><strong>{(activity.distance / 1000).toFixed(2)} km</strong><small>{formatDuration(activity.elapsed)}</small></div><div className="activity-value elevation-value"><strong>{Math.round(activity.elevation)} m</strong><small>desnivel +</small></div></article>)}</div> : <EmptyState icon="route" title="Tu próxima historia empieza aquí" text="Cuando termines una carrera, aparecerá guardada aquí." />}
+      {activities.length ? <div className="activity-list">{activities.slice().reverse().map((activity) => <button className="activity-row activity-row-button" key={activity.id} onClick={() => setSelectedActivity(activity)}><span className="activity-route-icon"><Icon name="route" size={19} /></span><span className="activity-name"><strong>{activity.name}</strong><small>{formatDate(activity.startedAt)} · {formatClock(activity.startedAt)}–{formatClock(activity.finishedAt)} · {activity.sport || 'Atletismo'}</small></span><span className="activity-value"><strong>{(activity.distance / 1000).toFixed(2)} km</strong><small>{formatDuration(activity.elapsed)}</small></span><span className="activity-value elevation-value"><strong>{Math.round(activity.elevation)} m</strong><small>desnivel +</small></span><Icon className="activity-row-arrow" name="chevron" size={16} /></button>)}</div> : <EmptyState icon="route" title="Tu próxima historia empieza aquí" text="Cuando termines una carrera, aparecerá guardada aquí." />}
     </section>
   )
 }

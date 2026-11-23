@@ -107,6 +107,20 @@ h1 span { color: var(--cyan); }
 .legend-dot { width: 7px; height: 7px; border-radius: 50%; background: #8be5f7; box-shadow: 0 0 0 3px rgba(139, 229, 247, .13); }
 .legend-route { width: 13px; height: 3px; border-radius: 2px; }
 .map-coordinate { margin-left: auto; font-size: 8px; }
+.map-location-error { padding: 8px 13px 10px; color: #ffb1a7; font-size: 9px; }
+.saved-route-card { overflow: hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+.saved-route-card .map-viewport { height: min(58vh, 480px); min-height: 280px; }
+.saved-route-summary { display: flex; align-items: center; gap: 29px; padding: 17px 19px; }
+.saved-route-summary > div { display: grid; gap: 5px; }
+.saved-route-summary > div > span { color: var(--muted); font-size: 8px; font-weight: 700; letter-spacing: .8px; }
+.saved-route-summary > div > strong { font: 600 13px 'Manrope', sans-serif; }
+.saved-route-summary .saved-route-pins { display: flex; flex-direction: row; gap: 14px; margin-left: auto; }
+.saved-route-pins > span { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 9px; }
+.saved-route-pins .endpoint-start, .saved-route-pins .endpoint-finish { width: 18px; height: 18px; }
+.activity-row-button { width: 100%; color: var(--text); background: transparent; text-align: left; font: inherit; cursor: pointer; }
+.activity-row-button:hover { background: var(--panel-raised); }
+.activity-row-arrow { color: var(--muted); }
+.route-back-button svg { transform: rotate(180deg); }
 .run-panel { padding: 15px 17px 12px; }
 .run-panel-header { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: 1.15px; }
 .run-panel-header button { width: 27px; height: 27px; border-color: transparent; background: transparent; }
@@ -268,6 +282,10 @@ h1 span { color: var(--cyan); }
   .subpage-heading .primary-button { min-height: 37px; padding-inline: 10px; font-size: 9px; }
   .subpage-heading .page-subtitle { max-width: 210px; }
   .activity-row { gap: 10px; padding: 11px; }
+  .saved-route-card .map-viewport { height: 52vh; min-height: 250px; }
+  .saved-route-summary { flex-wrap: wrap; gap: 13px 20px; padding: 14px; }
+  .saved-route-summary .saved-route-pins { width: 100%; margin-left: 0; }
+  .activity-row-arrow { display: none; }
   .activity-route-icon { width: 34px; height: 34px; }
   .activity-name strong { max-width: 155px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }
   .activity-name small, .activity-value small { font-size: 8px; }
